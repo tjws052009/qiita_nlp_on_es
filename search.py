@@ -21,12 +21,22 @@ knn_query = {
     "field": "text_embedding.predicted_value",
     "query_vector": input_embed,
     "k": 10,
-    "num_candidates": 100
+    "num_candidates": 100,
+    "boost": 0.3
+}
+
+search_query = {
+    "match": {
+        "text_field": {
+            "query": sys.argv[1],
+            "boost": 0.7
+        }
+    }
 }
 
 search_fields = ["title", "author", "file_path"]
 
-search_result = es.search(knn=knn_query, fields=search_fields, source=False)
+search_result = es.search(knn=knn_query, query=search_query, fields=search_fields, source=False)
 
 for hit in search_result['hits']['hits']:
     print(hit['fields']['author'][0] + " - " + hit['fields']['title'][0] + " - score: " + str(hit['_score']))
